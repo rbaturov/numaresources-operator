@@ -3,7 +3,7 @@
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
 # - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
-VERSION ?= 4.18.999-snapshot
+VERSION ?= 4.18.9999-snapshot-testing
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
@@ -33,7 +33,7 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 #
 # For example, running 'make bundle-build bundle-push catalog-build catalog-push' will build and push both
 # openshift-kni.io/numaresources-operator-bundle:$VERSION and openshift-kni.io/numaresources-operator-catalog:$VERSION.
-REPO ?= quay.io/openshift-kni
+REPO ?= quay.io/rh_ee_rbaturov
 IMAGE_TAG_BASE ?= $(REPO)/numaresources-operator
 
 # BUNDLE_IMG defines the image:tag used for the bundle.
@@ -56,7 +56,7 @@ endif
 GOOS=$(shell go env GOOS)
 GOARCH=$(shell go env GOARCH)
 
-CONTAINER_ENGINE ?= docker
+CONTAINER_ENGINE ?= podman
 
 BIN_DIR="bin"
 

@@ -8,8 +8,12 @@ rules:
   - ""
   resources:
   - configmaps
-  - serviceaccounts
-  - services
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
   verbs:
   - '*'
 - apiGroups:
@@ -24,9 +28,22 @@ rules:
   resources:
   - pods
   verbs:
+  - '*'
   - get
   - list
   - watch
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - '*'
 - apiGroups:
   - apiextensions.k8s.io
   resources:
@@ -37,6 +54,11 @@ rules:
   - apps
   resources:
   - daemonsets
+  verbs:
+  - '*'
+- apiGroups:
+  - apps
+  resources:
   - deployments
   verbs:
   - '*'
@@ -44,7 +66,6 @@ rules:
   - config.openshift.io
   resources:
   - clusteroperators
-  - infrastructures
   verbs:
   - get
 - apiGroups:
@@ -54,10 +75,15 @@ rules:
   verbs:
   - list
 - apiGroups:
+  - config.openshift.io
+  resources:
+  - infrastructures
+  verbs:
+  - get
+- apiGroups:
   - machineconfiguration.openshift.io
   resources:
   - kubeletconfigs
-  - machineconfigpools
   verbs:
   - get
   - list
@@ -68,6 +94,14 @@ rules:
   - kubeletconfigs/finalizers
   verbs:
   - update
+- apiGroups:
+  - machineconfiguration.openshift.io
+  resources:
+  - machineconfigpools
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups:
   - machineconfiguration.openshift.io
   resources:
@@ -84,14 +118,12 @@ rules:
   - nodetopology.openshift.io
   resources:
   - numaresourcesoperators/finalizers
-  - numaresourcesschedulers/finalizers
   verbs:
   - update
 - apiGroups:
   - nodetopology.openshift.io
   resources:
   - numaresourcesoperators/status
-  - numaresourcesschedulers/status
   verbs:
   - get
   - patch
@@ -109,11 +141,40 @@ rules:
   - update
   - watch
 - apiGroups:
+  - nodetopology.openshift.io
+  resources:
+  - numaresourcesschedulers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - nodetopology.openshift.io
+  resources:
+  - numaresourcesschedulers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - rbac.authorization.k8s.io
   resources:
   - clusterrolebindings
+  verbs:
+  - '*'
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
   - clusterroles
+  verbs:
+  - '*'
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
   - rolebindings
+  verbs:
+  - '*'
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
   - roles
   verbs:
   - '*'
