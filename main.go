@@ -238,6 +238,8 @@ func main() {
 		Metrics: metricsserver.Options{
 			// TODO: secureServing?
 			BindAddress: params.metricsAddr,
+			SecureServing: true,
+			CertDir: "/certs",
 		},
 		WebhookServer: webhook.NewServer(webhook.Options{
 			Port:    params.webhookPort,
