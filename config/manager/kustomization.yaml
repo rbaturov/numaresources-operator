@@ -13,4 +13,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: quay.io/rh_ee_rbaturov/numaresources-operator
-  newTag: secure-metrics-test2
+  newTag: secure-metrics-test4
