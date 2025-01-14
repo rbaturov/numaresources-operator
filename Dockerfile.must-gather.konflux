@@ -22,7 +22,7 @@ COPY --from=mgbuilder /usr/libexec/must-gather/numaresources-operator/* /usr/bin
 
 ENTRYPOINT ["/usr/bin/gather"]
 
-LABEL com.redhat.component="numaresources-must-gather-container" \
+LABEL com.redhat.component="numaresources-must-gather" \
     name="openshift4/numaresources-must-gather-rhel9" \
     upstream-vcs-type="git" \
     summary="numa resources data gathering image" \
