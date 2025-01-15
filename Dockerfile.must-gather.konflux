@@ -32,4 +32,5 @@ LABEL com.redhat.component="numaresources-must-gather" \
     description="numa resources data gathering image." \
     maintainer="openshift-operators@redhat.com" \
     io.openshift.maintainer.component="NUMA Resources Operator" \
-    io.openshift.maintainer.product="OpenShift Container Platform"
+    io.openshift.maintainer.product="OpenShift Container Platform" \
+    io.k8s.description="numa resources data gathering image."
