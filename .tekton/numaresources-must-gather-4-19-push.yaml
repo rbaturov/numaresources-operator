@@ -24,7 +24,7 @@ spec:
   - name: output-image
     value: quay.io/redhat-user-workloads/rh-ee-rbaturov-tenant/numaresources-must-gather-4-19:{{revision}}
   - name: dockerfile
-    value: .konflux/Dockerfile.must-gather
+    value: Dockerfile.must-gather
   pipelineSpec:
     description: |
       This pipeline is ideal for building container images from a Containerfile while reducing network traffic.
