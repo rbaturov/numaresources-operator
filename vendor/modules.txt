@@ -7,8 +7,8 @@ github.com/StackExchange/wmi
 # github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129
 ## explicit
 github.com/andres-erbsen/clock
-# github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492
-## explicit; go 1.15
+# github.com/aquasecurity/go-version v0.0.1
+## explicit; go 1.22.0
 github.com/aquasecurity/go-version/pkg/part
 github.com/aquasecurity/go-version/pkg/prerelease
 github.com/aquasecurity/go-version/pkg/version
@@ -376,9 +376,10 @@ github.com/spf13/pflag
 # github.com/stretchr/objx v0.5.2
 ## explicit; go 1.20
 github.com/stretchr/objx
-# github.com/stretchr/testify v1.9.0
+# github.com/stretchr/testify v1.10.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
+github.com/stretchr/testify/assert/yaml
 github.com/stretchr/testify/mock
 # github.com/vincent-petithory/dataurl v1.0.0
 ## explicit
