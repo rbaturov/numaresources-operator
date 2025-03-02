@@ -7,11 +7,12 @@ package cpu
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -22,6 +23,7 @@ import (
 
 var (
 	regexForCpulCore = regexp.MustCompile("^cpu([0-9]+)$")
+	onlineFile       = "online"
 )
 
 func (i *Info) load() error {
@@ -29,10 +31,12 @@ func (i *Info) load() error {
 	var totCores uint32
 	var totThreads uint32
 	for _, p := range i.Processors {
-		totCores += p.NumCores
-		totThreads += p.NumThreads
+		totCores += p.TotalCores
+		totThreads += p.TotalHardwareThreads
 	}
 	i.TotalCores = totCores
+	i.TotalHardwareThreads = totThreads
+	// TODO(jaypipes): Remove TotalThreads before v1.0
 	i.TotalThreads = totThreads
 	return nil
 }
@@ -47,7 +51,7 @@ func processorsGet(ctx *context.Context) []*Processor {
 	// /sys/devices/system/cpu pseudodir contains N number of pseudodirs with
 	// information about the logical processors on the host. These logical
 	// processor pseudodirs are of the pattern /sys/devices/system/cpu/cpu{N}
-	fnames, err := ioutil.ReadDir(paths.SysDevicesSystemCPU)
+	fnames, err := os.ReadDir(paths.SysDevicesSystemCPU)
 	if err != nil {
 		ctx.Warn("failed to read /sys/devices/system/cpu: %s", err)
 		return []*Processor{}
@@ -64,6 +68,15 @@ func processorsGet(ctx *context.Context) []*Processor {
 			continue
 		}
 
+		onlineFilePath := filepath.Join(paths.SysDevicesSystemCPU, fmt.Sprintf("cpu%d", lpID), onlineFile)
+		if _, err := os.Stat(onlineFilePath); err == nil {
+			if util.SafeIntFromFile(ctx, onlineFilePath) == 0 {
+				continue
+			}
+		} else if errors.Is(err, os.ErrNotExist) {
+			// Assume the CPU is online if the online state file doesn't exist
+			// (as is the case with older snapshots)
+		}
 		procID := processorIDFromLogicalProcessorID(ctx, lpID)
 		proc, found := procs[procID]
 		if !found {
@@ -95,6 +108,8 @@ func processorsGet(ctx *context.Context) []*Processor {
 				proc.Vendor = lp.Attrs["vendor_id"]
 			} else if len(lp.Attrs["isa"]) != 0 { // RISCV64
 				proc.Vendor = lp.Attrs["isa"]
+			} else if lp.Attrs["CPU implementer"] == "0x41" { // ARM
+				proc.Vendor = "ARM"
 			}
 			procs[procID] = proc
 		}
@@ -102,17 +117,31 @@ func processorsGet(ctx *context.Context) []*Processor {
 		coreID := coreIDFromLogicalProcessorID(ctx, lpID)
 		core := proc.CoreByID(coreID)
 		if core == nil {
-			core = &ProcessorCore{ID: coreID, NumThreads: 1}
+			core = &ProcessorCore{
+				ID:                   coreID,
+				TotalHardwareThreads: 1,
+				// TODO(jaypipes): Remove NumThreads before v1.0
+				NumThreads: 1,
+			}
 			proc.Cores = append(proc.Cores, core)
+			proc.TotalCores += 1
+			// TODO(jaypipes): Remove NumCores before v1.0
 			proc.NumCores += 1
 		} else {
+			core.TotalHardwareThreads += 1
+			// TODO(jaypipes) Remove NumThreads before v1.0
 			core.NumThreads += 1
 		}
+		proc.TotalHardwareThreads += 1
+		// TODO(jaypipes) Remove NumThreads before v1.0
 		proc.NumThreads += 1
 		core.LogicalProcessors = append(core.LogicalProcessors, lpID)
 	}
 	res := []*Processor{}
 	for _, p := range procs {
+		for _, c := range p.Cores {
+			sort.Ints(c.LogicalProcessors)
+		}
 		res = append(res, p)
 	}
 	return res
@@ -172,7 +201,7 @@ func CoresForNode(ctx *context.Context, nodeID int) ([]*ProcessorCore, error) {
 		return c
 	}
 
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
@@ -198,6 +227,15 @@ func CoresForNode(ctx *context.Context, nodeID int) ([]*ProcessorCore, error) {
 			)
 			continue
 		}
+		onlineFilePath := filepath.Join(cpuPath, onlineFile)
+		if _, err := os.Stat(onlineFilePath); err == nil {
+			if util.SafeIntFromFile(ctx, onlineFilePath) == 0 {
+				continue
+			}
+		} else if errors.Is(err, os.ErrNotExist) {
+			// Assume the CPU is online if the online state file doesn't exist
+			// (as is the case with older snapshots)
+		}
 		coreIDPath := filepath.Join(cpuPath, "topology", "core_id")
 		coreID := util.SafeIntFromFile(ctx, coreIDPath)
 		core := findCoreByID(coreID)
@@ -208,7 +246,9 @@ func CoresForNode(ctx *context.Context, nodeID int) ([]*ProcessorCore, error) {
 	}
 
 	for _, c := range cores {
-		c.NumThreads = uint32(len(c.LogicalProcessors))
+		c.TotalHardwareThreads = uint32(len(c.LogicalProcessors))
+		// TODO(jaypipes): Remove NumThreads before v1.0
+		c.NumThreads = c.TotalHardwareThreads
 	}
 
 	return cores, nil
