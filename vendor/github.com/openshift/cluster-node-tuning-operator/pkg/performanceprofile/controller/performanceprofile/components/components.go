@@ -35,13 +35,13 @@ type Handler interface {
 }
 
 type Options struct {
-	ProfileMCP    *mcov1.MachineConfigPool
-	MachineConfig MachineConfigOptions
+	ProfileMCP                  *mcov1.MachineConfigPool
+	MachineConfig               MachineConfigOptions
+	MixedCPUsFeatureGateEnabled bool
 }
 
 type MachineConfigOptions struct {
 	PinningMode      *apiconfigv1.CPUPartitioningMode
-	DefaultRuntime   mcov1.ContainerRuntimeDefaultRuntime
 	MixedCPUsEnabled bool
 }
 
