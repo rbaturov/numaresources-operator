@@ -9,7 +9,7 @@ require (
 	github.com/coreos/ignition/v2 v2.18.0
 	github.com/drone/envsubst v1.0.3
 	github.com/go-logr/logr v1.4.2
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	github.com/jaypipes/ghw v0.12.0
 	github.com/k8stopologyawareschedwg/deployer v0.21.3
 	github.com/k8stopologyawareschedwg/noderesourcetopology-api v0.1.2
