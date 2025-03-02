@@ -24,7 +24,7 @@ require (
 	github.com/openshift/hypershift/api v0.0.0-20241115183703-d41904871380
 	github.com/openshift/machine-config-operator v0.0.1-0.20230724174830-7b54f1dcce4e
 	github.com/sergi/go-diff v1.1.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/sync v0.10.0
 	k8s.io/api v0.31.2
 	k8s.io/apiextensions-apiserver v0.31.2
