@@ -72,7 +72,7 @@ require (
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/jaypipes/pcidb v1.0.0 // indirect
+	github.com/jaypipes/pcidb v1.0.1 // indirect
 	github.com/jeremywohl/flatten/v2 v2.0.0-20211013061545-07e4a09fb8e4 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
