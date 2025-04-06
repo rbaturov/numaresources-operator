@@ -7,7 +7,7 @@ require (
 	github.com/coreos/ignition/v2 v2.18.0
 	github.com/drone/envsubst v1.0.3
 	github.com/go-logr/logr v1.4.2
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	github.com/jaypipes/ghw v0.12.0
 	github.com/k8stopologyawareschedwg/deployer v0.21.3
 	github.com/k8stopologyawareschedwg/noderesourcetopology-api v0.1.2
@@ -22,7 +22,7 @@ require (
 	github.com/openshift/hypershift/api v0.0.0-20241115183703-d41904871380
 	github.com/openshift/machine-config-operator v0.0.1-0.20230724174830-7b54f1dcce4e
 	github.com/sergi/go-diff v1.1.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/sync v0.12.0
 	k8s.io/api v0.32.3
 	k8s.io/apiextensions-apiserver v0.32.3
@@ -92,8 +92,8 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/vincent-petithory/dataurl v1.0.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	go.opentelemetry.io/otel v1.28.0 // indirect
-	go.opentelemetry.io/otel/trace v1.28.0 // indirect
+	go.opentelemetry.io/otel v1.35.0 // indirect
+	go.opentelemetry.io/otel/trace v1.35.0 // indirect
 	go.uber.org/ratelimit v0.2.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.21.0 // indirect
