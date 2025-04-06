@@ -1,8 +1,8 @@
 module github.com/openshift-kni/numaresources-operator
 
-go 1.22.0
+go 1.23.0
 
-toolchain go1.22.8
+toolchain go1.23.8
 
 require (
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492
@@ -25,7 +25,7 @@ require (
 	github.com/openshift/machine-config-operator v0.0.1-0.20230724174830-7b54f1dcce4e
 	github.com/sergi/go-diff v1.1.0
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/sync v0.10.0
+	golang.org/x/sync v0.13.0
 	k8s.io/api v0.31.2
 	k8s.io/apiextensions-apiserver v0.31.2
 	k8s.io/apimachinery v0.31.2
