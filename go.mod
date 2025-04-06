@@ -2,7 +2,7 @@ module github.com/openshift-kni/numaresources-operator
 
 go 1.22.0
 
-toolchain go1.22.8
+toolchain go1.24.2
 
 require (
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492
