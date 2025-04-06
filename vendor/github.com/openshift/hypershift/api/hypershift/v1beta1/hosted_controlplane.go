@@ -34,6 +34,7 @@ type HostedControlPlane struct {
 }
 
 // HostedControlPlaneSpec defines the desired state of HostedControlPlane
+// +kubebuilder:validation:XValidation:rule="self.platform.type == 'IBMCloud' ? size(self.services) >= 3 : size(self.services) >= 4",message="spec.services in body should have at least 4 items or 3 for IBMCloud"
 type HostedControlPlaneSpec struct {
 	// ReleaseImage is the release image applied to the hosted control plane.
 	ReleaseImage string `json:"releaseImage"`
@@ -96,7 +97,7 @@ type HostedControlPlaneSpec struct {
 	// +optional
 	// +immutable
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ControllerAvailabilityPolicy is immutable"
-	// +kubebuilder:default:="SingleReplica"
+	// +kubebuilder:default:="HighlyAvailable"
 	ControllerAvailabilityPolicy AvailabilityPolicy `json:"controllerAvailabilityPolicy,omitempty"`
 
 	// InfrastructureAvailabilityPolicy specifies the availability policy applied
@@ -115,10 +116,23 @@ type HostedControlPlaneSpec struct {
 	// +optional
 	KubeConfig *KubeconfigSecretRef `json:"kubeconfig,omitempty"`
 
+	// kubeAPIServerDNSName specifies a desired DNS name to resolve to the KAS.
+	// When set, the controller will automatically generate a secret with kubeconfig and expose it in the hostedCluster Status.customKubeconfig field.
+	// If it's set or removed day 2, the kubeconfig generated secret will be created, recreated or deleted.
+	// The DNS entries should be resolvable from the cluster, so this should be manually configured in the DNS provider.
+	// This field works in conjunction with configuration.APIServer.ServingCerts.NamedCertificates to enable
+	// access to the API server via a custom domain name. The NamedCertificates provide the TLS certificates
+	// for the custom domain, while this field triggers the generation of a kubeconfig that uses those certificates.
+	//
+	// +kubebuilder:validation:XValidation:rule=`self == "" || self.matches('^(?:(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}|[a-zA-Z0-9-]+)$')`,message="kubeAPIServerDNSName must be a valid URL name (e.g., api.example.com)"
+	// +kubebuilder:validation:MaxLength=253
+	// +kubebuilder:example: "api.example.com"
+	// +optional
+	KubeAPIServerDNSName string `json:"kubeAPIServerDNSName,omitempty"`
+
 	// Services defines metadata about how control plane services are published
 	// in the management cluster.
 	// +kubebuilder:validation:MaxItems=6
-	// +kubebuilder:validation:MinItems=4
 	Services []ServicePublishingStrategyMapping `json:"services"`
 
 	// AuditWebhook contains metadata for configuring an audit webhook
@@ -138,6 +152,12 @@ type HostedControlPlaneSpec struct {
 	// https://docs.openshift.com/container-platform/4.7/rest_api/config_apis/config-apis-index.html
 	// +kubebuilder:validation:Optional
 	Configuration *ClusterConfiguration `json:"configuration,omitempty"`
+
+	// operatorConfiguration specifies configuration for individual OCP operators in the cluster.
+	//
+	// +optional
+	// +openshift:enable:FeatureGate=ClusterVersionOperatorConfiguration
+	OperatorConfiguration *OperatorConfiguration `json:"operatorConfiguration,omitempty"`
 
 	// ImageContentSources lists sources/repositories for the release-image content.
 	// +optional
@@ -175,15 +195,39 @@ type HostedControlPlaneSpec struct {
 	// +optional
 	Autoscaling ClusterAutoscaling `json:"autoscaling,omitempty"`
 
+	// autoNode specifies the configuration for the autoNode feature.
+	// +openshift:enable:FeatureGate=AutoNodeKarpenter
+	AutoNode *AutoNode `json:"autoNode,omitempty"`
+
 	// NodeSelector when specified, must be true for the pods managed by the HostedCluster to be scheduled.
 	//
 	// +optional
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 
-	// Tolerations when specified, define what custome tolerations are added to the hcp pods.
+	// Tolerations when specified, define what custom tolerations are added to the hcp pods.
 	//
 	// +optional
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+
+	// labels when specified, define what custom labels are added to the hcp pods.
+	// Changing this day 2 will cause a rollout of all hcp pods.
+	// Duplicate keys are not supported. If duplicate keys are defined, only the last key/value pair is preserved.
+	// Valid values are those in https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
+	//
+	// -kubebuilder:validation:XValidation:rule=`self.all(key, size(key) <= 317 && key.matches('^(([A-Za-z0-9]+(\\.[A-Za-z0-9]+)?)*[A-Za-z0-9]\\/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$'))`, message="label key must have two segments: an optional prefix and name, separated by a slash (/). The name segment is required and must be 63 characters or less, beginning and ending with an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and alphanumerics between. The prefix is optional. If specified, the prefix must be a DNS subdomain: a series of DNS labels separated by dots (.), not longer than 253 characters in total, followed by a slash (/)"
+	// -kubebuilder:validation:XValidation:rule=`self.all(key, size(self[key]) <= 63 && self[key].matches('^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$'))`, message="label value must be 63 characters or less (can be empty), consist of alphanumeric characters, dashes (-), underscores (_) or dots (.), and begin and end with an alphanumeric character"
+	// TODO: key/value validations break cost budget for <=4.17. We should figure why and enable it back.
+	// +kubebuilder:validation:MaxProperties=20
+	// +optional
+	Labels map[string]string `json:"labels,omitempty"`
+
+	// capabilities allows for disabling optional components at cluster install time.
+	// This field is optional and once set cannot be changed.
+	// +immutable
+	// +optional
+	// +kubebuilder:default={}
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf", message="Capabilities is immutable. Changes might result in unpredictable and disruptive behavior."
+	Capabilities *Capabilities `json:"capabilities,omitempty"`
 }
 
 // availabilityPolicy specifies a high level availability policy for components.
@@ -283,6 +327,15 @@ type HostedControlPlaneStatus struct {
 	// KubeConfig is a reference to the secret containing the default kubeconfig
 	// for this control plane.
 	KubeConfig *KubeconfigSecretRef `json:"kubeConfig,omitempty"`
+
+	// customKubeconfig references an external custom kubeconfig secret.
+	// This field is populated in the status when a custom kubeconfig secret has been generated
+	// for the hosted cluster. It contains the name and key of the secret located in the
+	// hostedCluster namespace. This field is only populated when kubeApiExternalName is set.
+	// If this field is removed during a day 2 operation, the referenced secret will be deleted
+	// and this field will be removed from the hostedCluster status.
+	// +optional
+	CustomKubeconfig *KubeconfigSecretRef `json:"customKubeconfig,omitempty"`
 
 	// KubeadminPassword is a reference to the secret containing the initial kubeadmin password
 	// for the guest cluster.
