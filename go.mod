@@ -1,8 +1,8 @@
 module github.com/openshift-kni/numaresources-operator
 
-go 1.22.0
+go 1.23
 
-toolchain go1.22.8
+toolchain go1.23.8
 
 require (
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492
@@ -67,7 +67,7 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/google/pprof v0.0.0-20240525223248-4bfdf5a9a2af // indirect
+	github.com/google/pprof v0.0.0-20250403155104-27863c87afa6 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
