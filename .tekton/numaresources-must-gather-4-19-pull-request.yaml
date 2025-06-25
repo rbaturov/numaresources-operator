@@ -501,7 +501,7 @@ spec:
         - name: name
           value: sast-shell-check
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-sast-shell-check:0.1@sha256:8567a911a467746e2785f1e4fb69e5c2bee1879df43a2ccdb8ae928e58274488
+          value: quay.io/konflux-ci/tekton-catalog/task-sast-shell-check:0.1@sha256:31a6b06b2f1377e582d4f21647be0faf8f1e96aaa1ab45197744f8d18d1fc61b
         - name: kind
           value: task
         resolver: bundles
