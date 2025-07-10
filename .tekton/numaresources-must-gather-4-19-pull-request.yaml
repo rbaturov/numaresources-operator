@@ -288,7 +288,9 @@ spec:
     - name: build-source-image
       params:
       - name: BINARY_IMAGE
-        value: $(params.output-image)
+        value: $(tasks.build-image-index.results.IMAGE_URL)
+      - name: BINARY_IMAGE_DIGEST
+        value: $(tasks.build-image-index.results.IMAGE_DIGEST)
       runAfter:
       - build-image-index
       taskRef:
@@ -296,7 +298,7 @@ spec:
         - name: name
           value: source-build
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-source-build:0.2@sha256:ab7298db687b1bdaa8f3fb4f24ee6c48e100283d0584eddac12ad4353b8a4e97
+          value: quay.io/konflux-ci/tekton-catalog/task-source-build:0.3@sha256:1fdda7563f21340d6243c8738934a58adffd8253706b423d1c4ec5e26ba5fae0
         - name: kind
           value: task
         resolver: bundles
