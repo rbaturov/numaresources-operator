@@ -14,7 +14,7 @@ RUN \
 	NRO_BUILD_VERSION=${OPERATOR_VERSION} \
 	make binary-all
 
-FROM registry.redhat.io/rhel9-4-els/rhel-minimal:9.4@sha256:9577a9ed1707ba2a1a229559d188a015cf3b20b18e4b83541f427697d1c0b8df
+FROM registry.redhat.io/rhel9-4-els/rhel-minimal:9.4@sha256:574decff4ac70ae46f9e6c562a20e429c3303b5173f2529b6e5f8a13827cdd7d
 
 ARG OPERATOR_VERSION
 ARG OPENSHIFT_VERSION
