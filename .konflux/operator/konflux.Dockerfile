@@ -1,6 +1,6 @@
 ARG OPERATOR_VERSION
 
-FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_golang_1.23@sha256:4805e1cb2d1bd9d3c5de5d6986056bbda94ca7b01642f721d83d26579d333c60 as builder
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_golang_1.23@sha256:6088f98bb99c94687824159ecc79c1368552a4fe6876be78fe9ebc2d69d9196e as builder
 
 WORKDIR /go/src/github.com/openshift-kni/numaresources-operator
 COPY . .
